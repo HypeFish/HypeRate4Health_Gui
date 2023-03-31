@@ -1,4 +1,4 @@
-package hyperate.hyperate4health.view;
+package hyperate.hyperate4health;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

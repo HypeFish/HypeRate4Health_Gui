@@ -8,9 +8,10 @@ module hyperate.hyperate4health {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
 
+
     opens hyperate.hyperate4health to javafx.fxml;
     exports hyperate.hyperate4health.controller;
     opens hyperate.hyperate4health.controller to javafx.fxml;
-    exports hyperate.hyperate4health.view;
-    opens hyperate.hyperate4health.view to javafx.fxml;
+    exports hyperate.hyperate4health;
+
 }
