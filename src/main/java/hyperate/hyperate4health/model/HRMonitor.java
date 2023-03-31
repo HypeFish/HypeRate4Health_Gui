@@ -1,6 +1,10 @@
 package hyperate.hyperate4health.model;
 
+import java.io.File;
 import java.net.ConnectException;
+import java.security.Timestamp;
+import java.util.HashMap;
+
 
 /**
  * @author HypeFish
@@ -39,7 +43,7 @@ public interface HRMonitor {
      *
      * @return all heart rates
      */
-    int[] getAllHeartRates();
+    HashMap<Timestamp, Integer> getAllHeartRates();
 
     /**
      * This method will stop the application
@@ -51,8 +55,8 @@ public interface HRMonitor {
     /**
      * This method will write the data collected into a csv file
      *
-     * @return true if the data was written to the csv file, false otherwise
+     * @return the file that was written to
      */
-    boolean writeData();
+    File writeData();
 
 }
