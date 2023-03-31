@@ -1,4 +1,4 @@
-package hyperate.hyperate4health;
+package hyperate.hyperate4health.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
