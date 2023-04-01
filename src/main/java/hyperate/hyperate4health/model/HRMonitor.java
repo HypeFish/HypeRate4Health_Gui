@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.ConnectException;
 import java.security.Timestamp;
 import java.util.HashMap;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
 
 
 /**
@@ -23,13 +25,29 @@ public interface HRMonitor {
 
     /**
      * This method will create a web socket connection to the server
+     * @param session the session that the connection will be made in
      */
-    void connect() throws ConnectException;
+    void onOpen(Session session);
 
     /**
      * This method will disconnect from the web socket
+     * @param session the session that the connection will be disconnected from
      */
-    void disconnect() throws ConnectException;
+    void onClose(Session session);
+
+    /**
+     * This method will be called when a message is received from the server
+     * @param session the session that the message was received from
+     * @param message the message that was received
+     */
+    void onMessage(Session session, String message);
+
+    /**
+     * This method will be called when an error occurs
+     * @param session the session that the error occurred in
+     * @param throwable the throwable that was thrown
+     */
+    void onError(Session session, Throwable throwable);
 
     /**
      * This method will retrieve the most recent heart rate

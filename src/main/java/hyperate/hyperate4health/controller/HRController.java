@@ -3,7 +3,7 @@ package hyperate.hyperate4health.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class HelloController {
+public class HRController {
     @FXML
     private Label welcomeText;
 

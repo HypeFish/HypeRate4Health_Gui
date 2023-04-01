@@ -2,6 +2,8 @@ module hyperate.hyperate4health {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
+    requires java.sql;
+    requires javax.websocket.api;
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;

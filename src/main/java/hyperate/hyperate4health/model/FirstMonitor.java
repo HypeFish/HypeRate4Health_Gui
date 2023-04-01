@@ -4,6 +4,11 @@ import java.io.File;
 import java.net.ConnectException;
 import java.security.Timestamp;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import javax.websocket.Session;
+import javax.websocket.server.*;
+
 
 /**
  * @author HypeFish
@@ -21,7 +26,12 @@ import java.util.HashMap;
  *     and retrieve data with the help of a proper DBMS.
  * </p>
  */
+@ServerEndpoint(value = "/chat/{username}")
 public class FirstMonitor implements HRMonitor {
+    private Session session;
+    private static final Set<FirstMonitor> chatEndpoints
+            = new CopyOnWriteArraySet<>();
+    private static final HashMap<String, String> users = new HashMap<>();
 
     /**
      * This constructor will create a new FirstMonitor object
@@ -32,17 +42,43 @@ public class FirstMonitor implements HRMonitor {
 
     /**
      * This method will create a web socket connection to the server
+     *
+     * @param session the session that the connection will be made in
      */
     @Override
-    public void connect() throws ConnectException {
+    public void onOpen(Session session) {
 
     }
 
     /**
      * This method will disconnect from the web socket
+     *
+     * @param session the session that the connection will be disconnected from
      */
     @Override
-    public void disconnect() throws ConnectException {
+    public void onClose(Session session) {
+
+    }
+
+    /**
+     * This method will be called when a message is received from the server
+     *
+     * @param session the session that the message was received from
+     * @param message the message that was received
+     */
+    @Override
+    public void onMessage(Session session, String message) {
+
+    }
+
+    /**
+     * This method will be called when an error occurs
+     *
+     * @param session   the session that the error occurred in
+     * @param throwable the throwable that was thrown
+     */
+    @Override
+    public void onError(Session session, Throwable throwable) {
 
     }
 
