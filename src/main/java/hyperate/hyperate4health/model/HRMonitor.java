@@ -1,11 +1,12 @@
 package hyperate.hyperate4health.model;
 
 import java.io.File;
-import java.net.ConnectException;
+import java.io.IOException;
 import java.security.Timestamp;
 import java.util.HashMap;
+import javax.websocket.EncodeException;
 import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+
 
 
 /**
@@ -26,28 +27,33 @@ public interface HRMonitor {
     /**
      * This method will create a web socket connection to the server
      * @param session the session that the connection will be made in
+     * @param username the username that will be used to connect to the web socket (maybe hyperate ID)
+     * @throws IOException if an error occurs while connecting to the web socket
      */
-    void onOpen(Session session);
+    void onOpen(Session session, String username) throws IOException, EncodeException;
 
     /**
      * This method will disconnect from the web socket
      * @param session the session that the connection will be disconnected from
+     * @throws IOException if an error occurs while disconnecting from the web socket
      */
-    void onClose(Session session);
+    void onClose(Session session) throws IOException;
 
     /**
      * This method will be called when a message is received from the server
      * @param session the session that the message was received from
      * @param message the message that was received
+     * @throws IOException if an error occurs while receiving the message
      */
-    void onMessage(Session session, String message);
+    void onMessage(Session session, String message) throws IOException;
 
     /**
      * This method will be called when an error occurs
      * @param session the session that the error occurred in
      * @param throwable the throwable that was thrown
+     * @throws IOException if an error occurs while handling the error
      */
-    void onError(Session session, Throwable throwable);
+    void onError(Session session, Throwable throwable) throws IOException;
 
     /**
      * This method will retrieve the most recent heart rate

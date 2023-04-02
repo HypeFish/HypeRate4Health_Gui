@@ -1,12 +1,12 @@
 package hyperate.hyperate4health.model;
 
 import java.io.File;
-import java.net.ConnectException;
+import java.io.IOException;
 import java.security.Timestamp;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import javax.websocket.Session;
+import javax.websocket.*;
 import javax.websocket.server.*;
 
 
@@ -14,16 +14,16 @@ import javax.websocket.server.*;
  * @author HypeFish
  * @version 1.0
  * <p>
- *     This class seeks to implement the basic functionality of the HRMonitor interface. This class will be used
- *     to establish a connection to the web socket, retrieve the most recent heart rate, retrieve all heart rates,
- *     stop the application, and write the data collected into a csv file.
+ * This class seeks to implement the basic functionality of the HRMonitor interface. This class will be used
+ * to establish a connection to the web socket, retrieve the most recent heart rate, retrieve all heart rates,
+ * stop the application, and write the data collected into a csv file.
  * </p>
  * <p>
- *     This class will attempt to establish a connection to the web socket. If the connection is successful, the
- *     application will be able to retrieve the most recent heart rate, retrieve all heart rates, and write the data
- *     collected into a csv file. If the connection is unsuccessful, the application will be able to stop the
- *     application. This will be done without the use of a database. A database may be used in the future to store
- *     and retrieve data with the help of a proper DBMS.
+ * This class will attempt to establish a connection to the web socket. If the connection is successful, the
+ * application will be able to retrieve the most recent heart rate, retrieve all heart rates, and write the data
+ * collected into a csv file. If the connection is unsuccessful, the application will be able to stop the
+ * application. This will be done without the use of a database. A database may be used in the future to store
+ * and retrieve data with the help of a proper DBMS.
  * </p>
  */
 @ServerEndpoint(value = "/chat/{username}")
@@ -43,20 +43,32 @@ public class FirstMonitor implements HRMonitor {
     /**
      * This method will create a web socket connection to the server
      *
-     * @param session the session that the connection will be made in
+     * @param session  the session that the connection will be made in
+     * @param username the username that will be used to connect to the web socket (maybe hyperate ID)
+     * @throws IOException if an error occurs while connecting to the web socket
      */
     @Override
-    public void onOpen(Session session) {
+    @OnOpen
+    public void onOpen(Session session, @PathParam("username") String username) throws IOException, EncodeException {
 
+        this.session = session;
+        chatEndpoints.add(this);
+        users.put(session.getId(), username);
+
+        Message message = new Message();
+        message.setFrom(username);
+        message.setContent("Connected!");
+        broadcast(message);
     }
 
     /**
      * This method will disconnect from the web socket
      *
      * @param session the session that the connection will be disconnected from
+     * @throws IOException if an error occurs while disconnecting from the web socket
      */
     @Override
-    public void onClose(Session session) {
+    public void onClose(Session session) throws IOException {
 
     }
 
@@ -65,9 +77,10 @@ public class FirstMonitor implements HRMonitor {
      *
      * @param session the session that the message was received from
      * @param message the message that was received
+     * @throws IOException if an error occurs while receiving the message
      */
     @Override
-    public void onMessage(Session session, String message) {
+    public void onMessage(Session session, String message) throws IOException {
 
     }
 
@@ -76,11 +89,13 @@ public class FirstMonitor implements HRMonitor {
      *
      * @param session   the session that the error occurred in
      * @param throwable the throwable that was thrown
+     * @throws IOException if an error occurs while handling the error
      */
     @Override
-    public void onError(Session session, Throwable throwable) {
+    public void onError(Session session, Throwable throwable) throws IOException {
 
     }
+
 
     /**
      * This method will retrieve the most recent heart rate
@@ -120,5 +135,19 @@ public class FirstMonitor implements HRMonitor {
     @Override
     public File writeData() {
         return new File("");
+    }
+
+    private static void broadcast(Message message) throws IOException, EncodeException {
+
+        chatEndpoints.forEach(endpoint -> {
+            synchronized (endpoint) {
+                try {
+                    endpoint.session.getBasicRemote().
+                            sendObject(message);
+                } catch (IOException | EncodeException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
