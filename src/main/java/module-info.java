@@ -9,6 +9,8 @@ module hyperate.hyperate4health {
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
+    requires org.json;
+    requires com.fasterxml.jackson.dataformat.csv;
 
 
     opens hyperate.hyperate4health to javafx.fxml;

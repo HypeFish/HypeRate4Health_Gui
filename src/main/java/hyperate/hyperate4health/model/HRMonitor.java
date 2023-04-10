@@ -1,8 +1,7 @@
 package hyperate.hyperate4health.model;
 
-import java.io.File;
 import java.io.IOException;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
@@ -47,6 +46,7 @@ public interface HRMonitor {
      */
     void onMessage(Session session, String message) throws IOException;
 
+
     /**
      * This method will be called when an error occurs
      * @param session the session that the error occurred in
@@ -60,7 +60,7 @@ public interface HRMonitor {
      *
      * @return the most recent heart rate
      */
-    int getHeartRate();
+    Integer getHeartRate();
 
     /**
      * This method will retrieve all heart rates
@@ -76,11 +76,5 @@ public interface HRMonitor {
      */
     boolean stopApplication();
 
-    /**
-     * This method will write the data collected into a csv file
-     *
-     * @return the file that was written to
-     */
-    File writeData();
 
 }
