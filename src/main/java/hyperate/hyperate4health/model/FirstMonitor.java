@@ -1,15 +1,16 @@
 package hyperate.hyperate4health.model;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.websocket.*;
-import javax.websocket.server.*;
+import javax.websocket.server.ServerEndpoint;
 
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.json.*;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 
 /**
  * @author HypeFish
@@ -27,8 +28,9 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
  * and retrieve data with the help of a proper DBMS.
  * </p>
  */
-@ServerEndpoint(value = "/chat/{username}")
-public class FirstMonitor implements HRMonitor {
+
+@ServerEndpoint(value = "/firstMonitor", encoders = {MessageEncoder.class}, decoders = {MessageDecoder.class})
+public class FirstMonitor extends Endpoint implements HRMonitor {
     private Session session;
     private static final Set<FirstMonitor> chatEndpoints
             = new CopyOnWriteArraySet<>();
@@ -41,13 +43,13 @@ public class FirstMonitor implements HRMonitor {
     private int ref = 0;
     private String msg = String.format("{\"topic\":\"%s\",\"event\":\"%s\",\"payload\":%s,\"ref\":%d}", topic, event, payload, ref);
     private JSONObject params = new JSONObject(msg);
-    private String address = String.format("wss://app.hyperate.io/socket/websocket?token=%s", this.apiKey);
+    private String apiKey = "9X0nFDdWrUx2m5n2pkj0NMy96Xb9f3WzNtSFRTvLzppGzFMRr7DluVY5w2PEcGWw";
+    private final String address = "wss://app.hyperate.io/socket/websocket?token=" + apiKey;
     private Timer responseBeat;
     private Timer closeBeat;
     private long lastHrTs = 0;
     private long startTime = Calendar.getInstance().getTimeInMillis();
     private HashMap<Timestamp, Integer> data = new HashMap<>();
-    private String apiKey;
     private String savePath;
     private File file;
 
@@ -67,29 +69,57 @@ public class FirstMonitor implements HRMonitor {
                     Calendar.getInstance().getTime() + Calendar.getInstance().getTime().getTime() + ".csv";
             this.savePath = savePath + "/" + fileName;
             this.file = new File(savePath);
-
+        }
+        try {
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, new URI(address));
+        } catch (DeploymentException | IOException | URISyntaxException e) {
+            e.printStackTrace();
         }
     }
 
     /**
      * This method will create a web socket connection to the server
      *
-     * @param session  the session that the connection will be made in
-     * @param username the username that will be used to connect to the web socket (maybe hyperate ID)
-     * @throws IOException if an error occurs while connecting to the web socket
+     * @param session the session that the connection will be made in
+     * @param config  the endpoint that the connection will be made to
      */
     @Override
     @OnOpen
-    public void onOpen(Session session, @PathParam("username") String username) throws IOException, EncodeException {
+    public void onOpen(Session session, EndpointConfig config) {
         this.session = session;
         chatEndpoints.add(this);
-        users.put(session.getId(), username);
-        session.getBasicRemote().sendText(params.toString());
-        System.out.println("on_open: Opened connection");
-        System.out.println("on_open: timer_set");
-        this.startTimer();
-        System.out.println("Connection to Hyperate established with ID " + hyperateId + "\n(i) For a better visual go to: app.hyperate.io/" + hyperateId);
+        try {
+            session.getBasicRemote().sendText(params.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    /**
+     * Begins the recording of the heart rate
+     */
+    public void beginRecording() {
+        this.session = this.makeWebsock();
+        this.runWebsock();
+    }
+
+    private void runWebsock() {
+
+        this.responseBeat = this.startTimer();
+        this.closeBeat = this.startTimer();
+
+    }
+
+    private Session makeWebsock() {
+        try {
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, new URI(address));
+            return this.session;
+        } catch (DeploymentException | IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -105,7 +135,7 @@ public class FirstMonitor implements HRMonitor {
             session.getBasicRemote().sendText(json.toString());
             System.out.println("respondToKeepOpen: sent HR, timer_set");
 
-            this.responseBeat = this.startTimer();
+            //this.responseBeat = this.startTimer();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -163,11 +193,12 @@ public class FirstMonitor implements HRMonitor {
      * This method will disconnect from the web socket
      *
      * @param session the session that the connection will be disconnected from
-     * @throws IOException if an error occurs while disconnecting from the web socket
      */
     @Override
-    public void onClose(Session session) throws IOException {
+    @OnClose
+    public void onClose(Session session, CloseReason reason) {
         this.stopApplication();
+        reason.getReasonPhrase();
     }
 
     /**
@@ -178,6 +209,7 @@ public class FirstMonitor implements HRMonitor {
      * @throws IOException if an error occurs while receiving the message
      */
     @Override
+    @OnMessage
     public void onMessage(Session session, String message) throws IOException {
         JSONObject m = new JSONObject(message);
         if (m.getString("event").equals("hr_update")) {
@@ -207,13 +239,15 @@ public class FirstMonitor implements HRMonitor {
     }
 
     private void toCSV() throws IOException {
-        CsvSchema schema;
-        CsvSchema.Builder schemaBuilder = CsvSchema.builder();
-        schemaBuilder.addColumn("UNIX_TIMESTAMP");
-        schemaBuilder.addColumn("HR");
-        schema = schemaBuilder.build().withHeader();
-        CsvMapper mapper = new CsvMapper();
-        mapper.writer(schema).writeValue(this.file, this.data);
+        FileWriter fw = new FileWriter(this.file);
+        BufferedWriter bw = new BufferedWriter(fw);
+        PrintWriter pw = new PrintWriter(bw);
+        pw.println("time,hr");
+        for (Map.Entry<Timestamp, Integer> entry : this.data.entrySet()) {
+            pw.println(entry.getKey().getTime() + "," + entry.getValue());
+        }
+        pw.flush();
+        pw.close();
     }
 
     private void filepath() throws IOException {
@@ -224,11 +258,11 @@ public class FirstMonitor implements HRMonitor {
      *
      * @param session   the session that the error occurred in
      * @param throwable the throwable that was thrown
-     * @throws IOException if an error occurs while handling the error
      */
     @Override
-    public void onError(Session session, Throwable throwable) throws IOException {
-        throw new IOException("Error occurred in session " + session.getId());
+    @OnError
+    public void onError(Session session, Throwable throwable) {
+        throwable.printStackTrace();
     }
 
 
@@ -250,18 +284,17 @@ public class FirstMonitor implements HRMonitor {
      *
      * @return all heart rates
      */
-    @Override @SuppressWarnings("unchecked")
+    @Override
+    @SuppressWarnings("unchecked")
     public HashMap<Timestamp, Integer> getAllHeartRates() {
         return (HashMap<Timestamp, Integer>) this.data.clone();
     }
 
     /**
      * This method will stop the application
-     *
-     * @return true if the application was stopped, false otherwise
      */
     @Override
-    public boolean stopApplication() {
+    public void stopApplication() {
         try {
             this.session.close();
         } catch (IOException e) {
@@ -269,7 +302,6 @@ public class FirstMonitor implements HRMonitor {
         }
         this.closeBeat.cancel();
         this.responseBeat.cancel();
-        return true;
     }
 
     /**
@@ -281,17 +313,12 @@ public class FirstMonitor implements HRMonitor {
         return new File("");
     }
 
-    private static void broadcast(Message message) throws IOException, EncodeException {
-
-        chatEndpoints.forEach(endpoint -> {
-            synchronized (endpoint) {
-                try {
-                    endpoint.session.getBasicRemote().
-                            sendObject(message);
-                } catch (IOException | EncodeException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    /**
+     * Gets the set of chat endpoints
+     * @return the set of chat endpoints
+     */
+    public Set<FirstMonitor> getChatEndpoints() {
+        return chatEndpoints;
     }
 }
+

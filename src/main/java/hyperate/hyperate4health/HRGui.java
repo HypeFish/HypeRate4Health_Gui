@@ -1,23 +1,25 @@
 package hyperate.hyperate4health;
 
+import hyperate.hyperate4health.controller.CLIController;
+import hyperate.hyperate4health.controller.HRControl;
+import hyperate.hyperate4health.model.HRMonitor;
+import hyperate.hyperate4health.view.HRCLI;
+import hyperate.hyperate4health.view.HRView;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 
-public class HRGui extends Application {
-    @Override
-    public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HRGui.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
-        stage.setScene(scene);
-        stage.show();
-    }
+public class HRGui {
 
-    public static void main(String[] args) {
-        launch();
+    public static void main(String[] args) throws IOException {
+    HRView view = new HRCLI();
+    HRControl controller = new CLIController(view, new InputStreamReader(System.in));
+    controller.run();
     }
 }
+
+

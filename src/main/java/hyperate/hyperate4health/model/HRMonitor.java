@@ -3,6 +3,7 @@ package hyperate.hyperate4health.model;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.Set;
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
 
@@ -23,20 +24,6 @@ import javax.websocket.Session;
 
 public interface HRMonitor {
 
-    /**
-     * This method will create a web socket connection to the server
-     * @param session the session that the connection will be made in
-     * @param username the username that will be used to connect to the web socket (maybe hyperate ID)
-     * @throws IOException if an error occurs while connecting to the web socket
-     */
-    void onOpen(Session session, String username) throws IOException, EncodeException;
-
-    /**
-     * This method will disconnect from the web socket
-     * @param session the session that the connection will be disconnected from
-     * @throws IOException if an error occurs while disconnecting from the web socket
-     */
-    void onClose(Session session) throws IOException;
 
     /**
      * This method will be called when a message is received from the server
@@ -46,14 +33,6 @@ public interface HRMonitor {
      */
     void onMessage(Session session, String message) throws IOException;
 
-
-    /**
-     * This method will be called when an error occurs
-     * @param session the session that the error occurred in
-     * @param throwable the throwable that was thrown
-     * @throws IOException if an error occurs while handling the error
-     */
-    void onError(Session session, Throwable throwable) throws IOException;
 
     /**
      * This method will retrieve the most recent heart rate
@@ -71,10 +50,18 @@ public interface HRMonitor {
 
     /**
      * This method will stop the application
-     *
-     * @return true if the application was stopped, false otherwise
      */
-    boolean stopApplication();
+    void stopApplication();
 
+    /**
+     * Begins the recording of the heart rate
+     */
+    void beginRecording();
+
+    /**
+     * Gets the set of chat endpoints
+     * @return the set of chat endpoints
+     */
+    Set<FirstMonitor> getChatEndpoints();
 
 }
