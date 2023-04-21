@@ -153,7 +153,7 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
     @OnClose
     public void onClose(Session session, CloseReason reason) {
         this.stopApplication();
-        reason.getReasonPhrase();
+        System.out.println("Application closed");
     }
 
     /**
@@ -167,6 +167,13 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
         System.out.println(throwable.getMessage());
     }
 
+    /**
+     * This method will start the application
+     */
+    @Override
+    public void start() {
+        System.out.println("Application started");
+    }
 
     /**
      * This method will retrieve the most recent heart rate
@@ -198,6 +205,7 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
     private void fileWriter() throws IOException {
         // Create file if it doesn't exist
         if (!file.exists()) {
+
             file.createNewFile();
         }
         // File to write data to if savePath is not null
@@ -237,10 +245,14 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
     /**
      * This method will stop the application
      */
-    private void stopApplication() {
+    public void stopApplication() {
         this.closeBeat.cancel();
         this.responseBeat.cancel();
-        System.out.println("Application stopped");
-        System.exit(0);
+        //stop the connection
+        try {
+            this.session.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

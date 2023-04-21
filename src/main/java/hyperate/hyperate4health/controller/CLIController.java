@@ -32,7 +32,6 @@ public class CLIController implements HRControl {
      */
     @Override
     public void run() throws IllegalStateException, IOException {
-
         view.renderMessage("Welcome to the HypeRate CLI! ");
         view.renderMessage("Thank you to HypeRate for making this possible! ");
         Scanner scanner = new Scanner(in);
@@ -58,11 +57,26 @@ public class CLIController implements HRControl {
             view.renderMessage("Invalid timeout. Please try again.");
             return;
         }
+        if (apiKey == null || apiKey.isEmpty()) {
+            view.renderMessage("Invalid API key. Please try again.");
+            return;
+        }
         FirstMonitor monitor = new FirstMonitor(hyperateId, timeout, savePath);
+        monitor.start();
 
         view.renderMessage("Connection to Hyperate established with ID " + hyperateId +
-                "\n(i) For a better visual go to: app.hyperate.io/" + hyperateId);
-        view.renderMessage("Heart rate data will be saved to: " + savePath + "/" + "HR:" + hyperateId + ".csv");
-        view.renderMessage("Heart rate will be saved every " + 3 + " seconds");
+                "\n(i) For a better visual go to: app.hyperate.io/" + hyperateId + "\n");
+        view.renderMessage("Heart rate data will be saved to: " + savePath + "/" + "HR:" + hyperateId + ".csv" + "\n");
+        view.renderMessage("Heart rate will be saved every " + 3 + " seconds" + "\n");
+
+        view.renderMessage("Type quit or exit to stop recording\n");
+
+        while (true) {
+            String stop = scanner.nextLine();
+            if (stop.equalsIgnoreCase("quit") || stop.equals("exit")) {
+                monitor.stopApplication();
+                break;
+            }
+        }
     }
 }

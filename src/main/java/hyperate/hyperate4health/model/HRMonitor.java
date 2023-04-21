@@ -1,12 +1,7 @@
 package hyperate.hyperate4health.model;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.Set;
-import javax.websocket.EncodeException;
-import javax.websocket.Session;
-
 
 
 /**
@@ -25,6 +20,11 @@ import javax.websocket.Session;
 public interface HRMonitor {
 
     /**
+     * This method will start the application
+     */
+    void start();
+
+    /**
      * This method will retrieve the most recent heart rate
      *
      * @return the most recent heart rate
@@ -38,6 +38,8 @@ public interface HRMonitor {
      */
     HashMap<Timestamp, Integer> getAllHeartRates();
 
-
-
+    /**
+     * This method will stop the application
+     */
+    void stopApplication();
 }
