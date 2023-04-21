@@ -1,25 +1,26 @@
 package hyperate.hyperate4health.model;
 
 import com.google.gson.Gson;
-import hyperate.hyperate4health.model.Message;
 
 import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
+import javax.websocket.EndpointConfig;
 
-public class MessageDecoder implements Decoder.Text<Message> {
+public class MessageDecoder implements Decoder.Text<String> {
     private static final Gson gson = new Gson();
+
     @Override
-    public Message decode(String s) throws DecodeException {
-        return gson.fromJson(s, Message.class);
+    public String decode(String message) throws DecodeException {
+        return gson.fromJson(message, String.class);
     }
 
     @Override
-    public boolean willDecode(String s) {
-        return (s != null);
+    public boolean willDecode(String message) {
+        return true;
     }
 
     @Override
-    public void init(javax.websocket.EndpointConfig endpointConfig) {
+    public void init(EndpointConfig endpointConfig) {
 
     }
 
@@ -27,4 +28,6 @@ public class MessageDecoder implements Decoder.Text<Message> {
     public void destroy() {
 
     }
+
+
 }

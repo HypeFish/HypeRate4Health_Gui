@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
-import java.util.Set;
 
 public class CLIController implements HRControl {
     private final HRView view;
@@ -34,8 +33,8 @@ public class CLIController implements HRControl {
     @Override
     public void run() throws IllegalStateException, IOException {
 
-        view.renderMessage("Welcome to the HypeRate CLI!");
-        view.renderMessage("Thank you to HypeRate for making this possible!");
+        view.renderMessage("Welcome to the HypeRate CLI! ");
+        view.renderMessage("Thank you to HypeRate for making this possible! ");
         Scanner scanner = new Scanner(in);
         view.renderMessage("Enter the HypeRate device ID. Example: AB12\n");
         String hyperateId = scanner.nextLine();
@@ -45,15 +44,25 @@ public class CLIController implements HRControl {
         int timeout = scanner.nextInt();
         view.renderMessage("Enter the API key to the recorder. If you do not specify, it will be automatically loaded from the \"HYPERATE_API_KEY\" environmental variable.\n");
         String apiKey = scanner.nextLine();
-//        if (apiKey.equals("")) {
-//            apiKey = System.getenv("HYPERATE_API_KEY");
-//        }
 
-
-
-        HRMonitor w = new FirstMonitor(hyperateId, timeout, apiKey, savePath);
         view.renderMessage("Starting recording...");
+        if (hyperateId == null || hyperateId.isEmpty()) {
+            view.renderMessage("Invalid HypeRate ID. Please try again.");
+            return;
+        }
+        if (savePath == null || savePath.isEmpty()) {
+            view.renderMessage("Invalid save path. Please try again.");
+            return;
+        }
+        if (timeout < 0) {
+            view.renderMessage("Invalid timeout. Please try again.");
+            return;
+        }
+        FirstMonitor monitor = new FirstMonitor(hyperateId, timeout, savePath);
 
-        w.beginRecording();
+        view.renderMessage("Connection to Hyperate established with ID " + hyperateId +
+                "\n(i) For a better visual go to: app.hyperate.io/" + hyperateId);
+        view.renderMessage("Heart rate data will be saved to: " + savePath + "/" + "HR:" + hyperateId + ".csv");
+        view.renderMessage("Heart rate will be saved every " + 3 + " seconds");
     }
 }

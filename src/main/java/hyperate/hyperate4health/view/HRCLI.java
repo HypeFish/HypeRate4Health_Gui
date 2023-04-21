@@ -5,7 +5,7 @@ import hyperate.hyperate4health.model.HRMonitor;
 import java.io.IOException;
 
 public class HRCLI implements HRView {
-    private Appendable out;
+    private final Appendable out;
 
     public HRCLI(Appendable out) {
         if (out == null)
@@ -19,9 +19,9 @@ public class HRCLI implements HRView {
     }
 
     /**
-     * Render a specific message to the provided data destination.
+     * Render a specific messager to the provided data destination.
      *
-     * @param message the message to be transmitted
+     * @param message the messager to be transmitted
      * @throws IllegalStateException if transmission of the board to the provided data destination fails
      */
     @Override
@@ -29,7 +29,7 @@ public class HRCLI implements HRView {
         try {
             out.append(message);
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot render message");
+            throw new IllegalStateException("Cannot render messager");
         }
     }
 }

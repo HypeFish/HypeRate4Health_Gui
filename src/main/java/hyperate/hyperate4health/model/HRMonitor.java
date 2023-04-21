@@ -24,16 +24,6 @@ import javax.websocket.Session;
 
 public interface HRMonitor {
 
-
-    /**
-     * This method will be called when a message is received from the server
-     * @param session the session that the message was received from
-     * @param message the message that was received
-     * @throws IOException if an error occurs while receiving the message
-     */
-    void onMessage(Session session, String message) throws IOException;
-
-
     /**
      * This method will retrieve the most recent heart rate
      *
@@ -48,20 +38,6 @@ public interface HRMonitor {
      */
     HashMap<Timestamp, Integer> getAllHeartRates();
 
-    /**
-     * This method will stop the application
-     */
-    void stopApplication();
 
-    /**
-     * Begins the recording of the heart rate
-     */
-    void beginRecording();
-
-    /**
-     * Gets the set of chat endpoints
-     * @return the set of chat endpoints
-     */
-    Set<FirstMonitor> getChatEndpoints();
 
 }

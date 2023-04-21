@@ -1,16 +1,19 @@
 package hyperate.hyperate4health.model;
 
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
+import org.json.JSONObject;
+
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-
-import org.json.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author HypeFish
@@ -29,49 +32,41 @@ import org.json.*;
  * </p>
  */
 
-@ServerEndpoint(value = "/firstMonitor", encoders = {MessageEncoder.class}, decoders = {MessageDecoder.class})
+@ServerEndpoint(value = "/firstMonitor", decoders = MessageDecoder.class, encoders = MessageEncoder.class)
 public class FirstMonitor extends Endpoint implements HRMonitor {
     private Session session;
-    private static final Set<FirstMonitor> chatEndpoints
-            = new CopyOnWriteArraySet<>();
-    private static final HashMap<String, String> users = new HashMap<>();
-    private String hyperateId;
-    private int timeout;
-    private String topic = "hr:" + hyperateId;
-    private String event = "phx_join";
-    private String payload = "{}";
-    private int ref = 0;
-    private String msg = String.format("{\"topic\":\"%s\",\"event\":\"%s\",\"payload\":%s,\"ref\":%d}", topic, event, payload, ref);
-    private JSONObject params = new JSONObject(msg);
-    private String apiKey = "9X0nFDdWrUx2m5n2pkj0NMy96Xb9f3WzNtSFRTvLzppGzFMRr7DluVY5w2PEcGWw";
-    private final String address = "wss://app.hyperate.io/socket/websocket?token=" + apiKey;
-    private Timer responseBeat;
-    private Timer closeBeat;
-    private long lastHrTs = 0;
-    private long startTime = Calendar.getInstance().getTimeInMillis();
-    private HashMap<Timestamp, Integer> data = new HashMap<>();
-    private String savePath;
-    private File file;
+    private final String hyperateId;
+    private final int timeout;
+    private final String savePath;
 
+    private final Timer responseBeat = new Timer();
+    private Timer closeBeat = new Timer();
+    private final HashMap<Timestamp, Integer> data = new HashMap<>();
+    private File file;
 
     /**
      * This constructor will create a new FirstMonitor object
      */
-    public FirstMonitor(String hyperateId, int timeout, String apiKey, String savePath) {
+    public FirstMonitor(String hyperateId, int timeout, String savePath) {
+
+        if (hyperateId == null || hyperateId.equals("")) {
+            throw new IllegalArgumentException("Hyperate ID cannot be null or empty");
+        }
+        if (timeout < 0) {
+            throw new IllegalArgumentException("Timeout cannot be negative");
+        }
+        if (savePath == null || savePath.equals("")) {
+            throw new IllegalArgumentException("Save path cannot be null or empty");
+        }
+
         this.hyperateId = hyperateId;
         this.timeout = timeout;
-        this.apiKey = apiKey;
+        this.savePath = savePath;
 
-        if (savePath.endsWith(".csv")) {
-            this.savePath = savePath;
-        } else {
-            String fileName = "HR_" + hyperateId + "_" +
-                    Calendar.getInstance().getTime() + Calendar.getInstance().getTime().getTime() + ".csv";
-            this.savePath = savePath + "/" + fileName;
-            this.file = new File(savePath);
-        }
         try {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            String apiKey = "9X0nFDdWrUx2m5n2pkj0NMy96Xb9f3WzNtSFRTvLzppGzFMRr7DluVY5w2PEcGWw";
+            String address = "wss://app.hyperate.io/socket/websocket?token=" + apiKey;
             this.session = container.connectToServer(this, new URI(address));
         } catch (DeploymentException | IOException | URISyntaxException e) {
             e.printStackTrace();
@@ -84,108 +79,69 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
      * @param session the session that the connection will be made in
      * @param config  the endpoint that the connection will be made to
      */
-    @Override
+
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
         this.session = session;
-        chatEndpoints.add(this);
+        this.file = new File( savePath + "/" + "HR:" + this.hyperateId + ".csv");
+        String login = new JSONObject()
+                .put("topic", "hr:" + hyperateId)
+                .put("event", "phx_join")
+                .put("payload", "{}")
+                .put("ref", 0)
+                .toString();
+        JSONObject loginParams = new JSONObject(login);
+
+        //Sets up the timer to keep the connection open
         try {
-            session.getBasicRemote().sendText(params.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+            session.getBasicRemote().sendText(loginParams.toString());
+            responseBeat.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    respondToKeepOpen();
+                }
+            }, 0, 3000);
 
-    /**
-     * Begins the recording of the heart rate
-     */
-    public void beginRecording() {
-        this.session = this.makeWebsock();
-        this.runWebsock();
-    }
-
-    private void runWebsock() {
-
-        this.responseBeat = this.startTimer();
-        this.closeBeat = this.startTimer();
-
-    }
-
-    private Session makeWebsock() {
-        try {
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = container.connectToServer(this, new URI(address));
-            return this.session;
-        } catch (DeploymentException | IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * This method will send a message to the web socket to keep the connection open
-     */
-    private void respondToKeepOpen() {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("topic", "phoenix");
-            json.put("event", "heartbeat");
-            json.put("payload", new JSONObject());
-            json.put("ref", 0);
-            session.getBasicRemote().sendText(json.toString());
-            System.out.println("respondToKeepOpen: sent HR, timer_set");
-
-            //this.responseBeat = this.startTimer();
+            //Sets up the timer to close the connection if no data is received
+            closeBeat.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    stopApplication();
+                }
+            }, timeout * 2000L);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    /**
-     * Creates a timer that should go off every 20 seconds
-     *
-     * @return the timer that was created
-     */
-    private Timer startTimer() {
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
+        session.addMessageHandler(new MessageHandler.Whole<String>() {
+            /**
+             * Called when the message has been fully received.
+             *
+             * @param message the message data.
+             */
             @Override
-            public void run() {
-                respondToKeepOpen();
+            @OnMessage
+            public void onMessage(String message) {
+                JSONObject json = new JSONObject(message);
+                if (json.has("event")) {
+                    if (json.getString("event").equals("hr_update")) {
+                        closeBeat.cancel();
+                        closeBeat = new Timer();
+                        closeBeat.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                stopApplication();
+                            }
+                        }, timeout * 2000L);
+
+                        Calendar.getInstance().getTimeInMillis();
+                        System.out.println("Heart Rate: " + json.getJSONObject("payload").getInt("hr"));
+                        data.put(new Timestamp(System.currentTimeMillis()), json.getJSONObject("payload").getInt("hr"));
+                    }
+                }
             }
-        }, 20000);
-        return timer;
-    }
-
-
-    /**
-     * This method will save the CSV file to the specified filepath.
-     * The view will be responsible for getting the filepath from the user through the GUI
-     *
-     * @param fileName The String of the filepath to save the file to
-     * @return the file that was saved
-     * @throws IllegalArgumentException if an error occurs while saving the file
-     */
-    private File saveFile(String fileName) throws IllegalArgumentException {
-
-        if (fileName == null) {
-            throw new IllegalArgumentException("File name cannot be null.");
-        }
-
-        File file = new File(fileName);
-
-        if (file.exists()) {
-            throw new IllegalArgumentException("File already exists in this location.");
-        }
-
-        try {
-            File newFile = new File(fileName);
-            return newFile.getCanonicalFile();
-        } catch (IOException ioException) {
-            // Print information regarding the error if there is one.
-            throw new IllegalArgumentException();
-        }
+        });
     }
 
 
@@ -194,63 +150,10 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
      *
      * @param session the session that the connection will be disconnected from
      */
-    @Override
     @OnClose
     public void onClose(Session session, CloseReason reason) {
         this.stopApplication();
         reason.getReasonPhrase();
-    }
-
-    /**
-     * This method will be called when a message is received from the server
-     *
-     * @param session the session that the message was received from
-     * @param message the message that was received
-     * @throws IOException if an error occurs while receiving the message
-     */
-    @Override
-    @OnMessage
-    public void onMessage(Session session, String message) throws IOException {
-        JSONObject m = new JSONObject(message);
-        if (m.getString("event").equals("hr_update")) {
-            this.responseBeat.cancel();
-            this.responseBeat = this.startTimer();
-            System.out.println("on_message: " + message);
-            this.data.put(new Timestamp(System.currentTimeMillis()), m.getJSONObject("payload").getInt("hr"));
-            try {
-                if (this.file.exists()) {
-                    FileWriter fw = new FileWriter(this.file, true);
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    PrintWriter pw = new PrintWriter(bw);
-                    pw.println(System.currentTimeMillis() + "," + m.getJSONObject("payload").getInt("hr"));
-                    pw.flush();
-                    pw.close();
-                } else {
-                    System.out.println("WARNING: Original file was moved or deleted. Re-saving entire dataset as " + this.file);
-                    toCSV();
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-                System.out.println("ERROR OCCURRED WHEN SAVING: CRASH SAVING TO " + this.file);
-                toCSV();
-                this.stopApplication();
-            }
-        }
-    }
-
-    private void toCSV() throws IOException {
-        FileWriter fw = new FileWriter(this.file);
-        BufferedWriter bw = new BufferedWriter(fw);
-        PrintWriter pw = new PrintWriter(bw);
-        pw.println("time,hr");
-        for (Map.Entry<Timestamp, Integer> entry : this.data.entrySet()) {
-            pw.println(entry.getKey().getTime() + "," + entry.getValue());
-        }
-        pw.flush();
-        pw.close();
-    }
-
-    private void filepath() throws IOException {
     }
 
     /**
@@ -259,10 +162,9 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
      * @param session   the session that the error occurred in
      * @param throwable the throwable that was thrown
      */
-    @Override
     @OnError
     public void onError(Session session, Throwable throwable) {
-        throwable.printStackTrace();
+        System.out.println(throwable.getMessage());
     }
 
 
@@ -273,10 +175,14 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
      */
     @Override
     public Integer getHeartRate() {
-        return this.data.entrySet().stream()
-                .max(Map.Entry.comparingByKey())
-                .map(Map.Entry::getValue)
-                .orElse(null);
+        HashMap<Timestamp, Integer> copy = new HashMap<>(this.data);
+        Timestamp mostRecent = new Timestamp(0);
+        for (Timestamp t : copy.keySet()) {
+            if (mostRecent == null || mostRecent.before(t)) {
+                mostRecent = t;
+            }
+        }
+        return copy.get(mostRecent);
     }
 
     /**
@@ -285,40 +191,56 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
      * @return all heart rates
      */
     @Override
-    @SuppressWarnings("unchecked")
     public HashMap<Timestamp, Integer> getAllHeartRates() {
-        return (HashMap<Timestamp, Integer>) this.data.clone();
+        return new HashMap<>(this.data);
+    }
+
+    private void fileWriter() throws IOException {
+        // Create file if it doesn't exist
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        // File to write data to if savePath is not null
+        FileWriter fileWriter = new FileWriter(file, true);
+        //write header to csv file if it is empty
+
+        if (file.length() == 0) {
+            fileWriter.write("Timestamp,Heart Rate (BPM) \n");
+        }
+        if (getHeartRate() == null) {
+            fileWriter.write(new Timestamp(System.currentTimeMillis()) + "," + "0" + "\n");
+        } else
+            fileWriter.write(new Timestamp(System.currentTimeMillis()) + "," + getHeartRate() + "\n");
+        fileWriter.close();
+    }
+
+    /**
+     * This method will send a message to the web socket to keep the connection open
+     */
+    private void respondToKeepOpen() {
+        try {
+            this.session.getBasicRemote().sendText(new JSONObject()
+                    .put("topic", "phoenix")
+                    .put("event", "heartbeat")
+                    .put("payload", "{}")
+                    .put("ref", 0)
+                    .toString());
+            //write to file if savePath is not null
+            if (this.savePath != null) {
+                fileWriter();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * This method will stop the application
      */
-    @Override
-    public void stopApplication() {
-        try {
-            this.session.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void stopApplication() {
         this.closeBeat.cancel();
         this.responseBeat.cancel();
-    }
-
-    /**
-     * This method will write the data collected into a csv file
-     *
-     * @return the file that was written to
-     */
-    private File writeData() {
-        return new File("");
-    }
-
-    /**
-     * Gets the set of chat endpoints
-     * @return the set of chat endpoints
-     */
-    public Set<FirstMonitor> getChatEndpoints() {
-        return chatEndpoints;
+        System.out.println("Application stopped");
+        System.exit(0);
     }
 }
-
