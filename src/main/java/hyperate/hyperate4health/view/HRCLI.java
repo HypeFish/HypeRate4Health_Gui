@@ -29,7 +29,7 @@ public class HRCLI implements HRView {
         try {
             out.append(message);
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot render messager");
+            throw new IllegalStateException("Unable to render message");
         }
     }
 }

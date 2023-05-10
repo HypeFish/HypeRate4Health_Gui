@@ -31,7 +31,6 @@ import java.util.TimerTask;
  * and retrieve data with the help of a proper DBMS.
  * </p>
  */
-
 @ServerEndpoint(value = "/firstMonitor", decoders = MessageDecoder.class, encoders = MessageEncoder.class)
 public class FirstMonitor extends Endpoint implements HRMonitor {
     private Session session;
@@ -207,6 +206,7 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
         if (!file.exists()) {
 
             file.createNewFile();
+
         }
         // File to write data to if savePath is not null
         FileWriter fileWriter = new FileWriter(file, true);
