@@ -1,4 +1,4 @@
-package hyperate.hyperate4health.model;
+package CLI.model;
 
 import java.sql.Timestamp;
 import java.util.HashMap;

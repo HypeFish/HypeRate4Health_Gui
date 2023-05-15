@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<GridPane alignment="CENTER" hgap="20.0" prefHeight="290.0" prefWidth="350.0" styleClass="root" vgap="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hyperate.hyperate4health.LoginController">
+
+    <padding>
+        <Insets bottom="10.0" left="25.0" right="25.0" top="25.0" />
+    </padding>
+
+    <Text id="welcome-text" fill="#fc0000" fontSmoothingType="LCD" text="Hyperate4Health" textAlignment="CENTER" underline="true" wrappingWidth="244.875" GridPane.columnSpan="2">
+        <font>
+            <Font name="System Bold" size="13.0" />
+        </font>
+    </Text>
+
+    <Label prefHeight="15.0" prefWidth="77.0" text="User Name:" textFill="#ee6969" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+    <TextField fx:id="hyperateId" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+
+    <Label text="Save Path:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+    <TextField fx:id="savePath" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+
+    <Label text="Timeout:" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+    <TextField fx:id="timeout" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+
+    <HBox fx:id="button" alignment="bottom_right" spacing="10" GridPane.columnIndex="2" GridPane.rowIndex="4">
+        <Button defaultButton="true" onAction="#handleSubmitButtonAction" prefHeight="25.0" prefWidth="164.0" text="Sign In" />
+    </HBox>
+
+    <Text fx:id="loginText" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+
+    <stylesheets>
+        <URL value="@Login.css" />
+    </stylesheets>
+    <columnConstraints>
+        <ColumnConstraints />
+        <ColumnConstraints />
+        <ColumnConstraints />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints />
+    </rowConstraints>
+
+
+</GridPane>
