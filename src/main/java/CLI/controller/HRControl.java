@@ -1,9 +1,9 @@
-package hyperate.hyperate4health.controller;
+package CLI.controller;
 
 import java.io.IOException;
 
 /**
- * Represents the controller for the HR GUI. Interface is supplied with a method to run the program on the
+ * Represents the CLI.controller.controller for the HR GUI. Interface is supplied with a method to run the program on the
  * command line, another interface will be supplied to run the program in a GUI.
  */
 public interface HRControl {

@@ -1,7 +1,4 @@
-package hyperate.hyperate4health.view;
-import hyperate.hyperate4health.model.HRMonitor;
-
-import java.io.IOException;
+package CLI.view;
 
 /**
  * Represents the view for the HR GUI. Interface is supplied with a method to display the app

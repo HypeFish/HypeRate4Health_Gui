@@ -1,6 +1,4 @@
-package hyperate.hyperate4health.view;
-
-import hyperate.hyperate4health.model.HRMonitor;
+package CLI.view;
 
 import java.io.IOException;
 

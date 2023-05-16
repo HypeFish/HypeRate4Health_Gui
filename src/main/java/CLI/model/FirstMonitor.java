@@ -1,7 +1,6 @@
-package hyperate.hyperate4health.model;
+package CLI.model;
 
 import org.json.JSONObject;
-
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.File;
@@ -33,15 +32,14 @@ import java.util.TimerTask;
  */
 @ServerEndpoint(value = "/firstMonitor", decoders = MessageDecoder.class, encoders = MessageEncoder.class)
 public class FirstMonitor extends Endpoint implements HRMonitor {
-    private Session session;
-    private final String hyperateId;
-    private final int timeout;
-    private final String savePath;
-
-    private final Timer responseBeat = new Timer();
-    private Timer closeBeat = new Timer();
-    private final HashMap<Timestamp, Integer> data = new HashMap<>();
-    private File file;
+    protected final String hyperateId;
+    protected final int timeout;
+    protected final String savePath;
+    protected final Timer responseBeat = new Timer();
+    protected final HashMap<Timestamp, Integer> data = new HashMap<>();
+    protected Session session;
+    protected Timer closeBeat = new Timer();
+    protected File file;
 
     /**
      * This constructor will create a new FirstMonitor object
@@ -52,7 +50,7 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
             throw new IllegalArgumentException("Hyperate ID cannot be null or empty");
         }
         if (timeout < 0) {
-            throw new IllegalArgumentException("Timeout cannot be negative");
+            throw new IllegalArgumentException("timeout cannot be negative");
         }
         if (savePath == null || savePath.equals("")) {
             throw new IllegalArgumentException("Save path cannot be null or empty");
@@ -82,7 +80,7 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
         this.session = session;
-        this.file = new File( savePath + "/" + "HR:" + this.hyperateId + ".csv");
+        this.file = new File(savePath + "/" + "HR:" + this.hyperateId + ".csv");
         String login = new JSONObject()
                 .put("topic", "hr:" + hyperateId)
                 .put("event", "phx_join")

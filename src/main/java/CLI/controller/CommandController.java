@@ -1,15 +1,15 @@
-package hyperate.hyperate4health.controller;
+package CLI.controller;
 
-import hyperate.hyperate4health.model.FirstMonitor;
-import hyperate.hyperate4health.model.HRMonitor;
-import hyperate.hyperate4health.view.HRView;
+import CLI.model.FirstMonitor;
+import CLI.model.HRMonitor;
+import CLI.view.HRView;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
 /**
- * This class represents the controller for the command line interface. It implements the HRControl
+ * This class represents the CLI.controller.controller for the command line interface. It implements the HRControl
  * interface.
  */
 public class CommandController implements HRControl {
@@ -63,23 +63,20 @@ public class CommandController implements HRControl {
             + "from the \"HYPERATE_API_KEY\" environmental variable.\n");
     final String apiKey = scanner.nextLine();
 
-    view.renderMessage("Starting recording...");
+    view.renderMessage("Starting recording...\n");
     if (hyperateId == null || hyperateId.isEmpty()) {
-      view.renderMessage("Invalid HypeRate ID. Please try again.");
+      view.renderMessage("Invalid HypeRate ID. Please try again.\n");
       return;
     }
     if (savePath == null || savePath.isEmpty()) {
-      view.renderMessage("Invalid save path. Please try again.");
+      view.renderMessage("Invalid save path. Please try again\n");
       return;
     }
     if (timeout < 0) {
-      view.renderMessage("Invalid timeout. Please try again.");
+      view.renderMessage("Invalid timeout. Please try again.\n");
       return;
     }
-    if (apiKey == null || apiKey.isEmpty()) {
-      view.renderMessage("Invalid API key. Please try again.");
-      return;
-    }
+
     FirstMonitor monitor = new FirstMonitor(hyperateId, timeout, savePath);
     monitor.start();
 
