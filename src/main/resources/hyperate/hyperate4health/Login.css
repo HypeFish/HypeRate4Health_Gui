@@ -7,7 +7,7 @@ root {
 .label {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: #f60707;
+    -fx-text-fill: #7bddee;
     -fx-effect: dropshadow( gaussian , rgba(217, 177, 177, 0.5), 0,0,0,1 );
 }
 

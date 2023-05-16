@@ -21,7 +21,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("EntryScreen.fxml")));
-        Scene scene = new Scene(root, 300, 275);
+        Scene scene = new Scene(root, 500, 500);
         stage.setTitle("Hyperate4Health");
         stage.setScene(scene);
         stage.setResizable(false);
