@@ -1,7 +1,7 @@
 package hyperate.hyperate4health;
 
-import CLI.model.FirstMonitor;
-import CLI.model.HRMonitor;
+import CLI.Model.FirstMonitor;
+import CLI.Model.HRMonitor;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
