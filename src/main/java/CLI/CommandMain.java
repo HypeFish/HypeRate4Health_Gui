@@ -12,6 +12,7 @@ public class CommandMain {
 	public static void main(String[] args) throws IOException {
 		HrView view = new HrCli();
 		HRControl controller = new CommandController(view, new InputStreamReader(System.in));
+
 		controller.run();
 	}
 }

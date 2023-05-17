@@ -42,17 +42,21 @@ public class CommandController implements HRControl {
         view.renderMessage("Enter the HypeRate device ID. Example: AB12\n");
         final String hyperateId = scanner.nextLine();
         view.renderMessage(
-                """
-                        Enter the path to where you want to save the file. To override default file naming, you can specify a filename ending in .csv
-                        Example: /user/Documents
-                        Example: /user/Documents/HR.csv
-                        (i) If the file exists already, it will be replaced.
-                        """);
+                "Enter the path to where you want to save the file. To override default file naming, you can specify a filename ending in .csv\n" +
+                "Example: /user/Documents\n" +
+                "Example: /user/Documents/HR.csv\n" +
+                "(i) If the file exists already, it will be replaced.\n");
         final String savePath = scanner.nextLine();
         view.renderMessage(
                 "Enter the minimum time allowed between HR signals for the connection to remain open and "
                         + "the program to be running.\n");
-        final int timeout = scanner.nextInt();
+        int timeout;
+       try {
+             timeout = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            view.renderMessage("Invalid timeout. Please try again.\n");
+            return;
+       }
         view.renderMessage("Starting recording...\n");
         if (hyperateId == null || hyperateId.length() != 4) {
             view.renderMessage("Invalid HypeRate ID. Please try again.\n");
