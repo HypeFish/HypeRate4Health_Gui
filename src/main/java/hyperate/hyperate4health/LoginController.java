@@ -121,6 +121,9 @@ public class LoginController implements Initializable {
         //Check if given id and name exist in database
         try {
             preparedStatement =
+                    connection.prepareStatement("USE hyperate4health;");
+            preparedStatement.executeQuery();
+            preparedStatement =
                     connection.prepareStatement("select * from person where hyperate_id = ? and name = ?");
             preparedStatement.setString(1, hyperateIdString);
             preparedStatement.setString(2, name);
@@ -274,13 +277,6 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //Set the text fields
-        hyperateId.setText("79C2");
-        username.setText("Skye");
-        age.setText("19");
-        dob.setText("2003-06-02");
-        timeout.setText("10");
-        savePath.setText("/Users/skyetoral/IdeaProjects/HypeRate4Health/src/main/CSVData/");
 
     }
 }

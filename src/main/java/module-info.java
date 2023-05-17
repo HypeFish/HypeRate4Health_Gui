@@ -11,15 +11,16 @@ module hyperate.hyperate4health {
     requires com.google.gson;
     requires java.desktop;
 
+
+    exports hyperate.hyperate4health;
+    opens hyperate.hyperate4health to javafx.controls , javafx.fxml;
+
     exports CLI.model;
     opens CLI.model to javafx.base;
     exports CLI.view;
     opens CLI.view to javafx.fxml;
-    opens hyperate.hyperate4health to javafx.fxml;
     exports CLI;
     opens CLI to javafx.fxml;
-    exports hyperate.hyperate4health;
     exports CLI.controller;
     opens CLI.controller to javafx.fxml;
-
 }
