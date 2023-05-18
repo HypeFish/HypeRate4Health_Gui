@@ -7,6 +7,7 @@ import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -131,6 +132,14 @@ public class MainScreenController implements Initializable {
                     try {
                         hr = hrMonitor.getHeartRate();
                         series.getData().add(new XYChart.Data<>(time, hr));
+                        Set<Node> nodes = lineChart.lookupAll(".series" + 0);
+                        for (Node n : nodes) {
+                            n.setStyle("-fx-background-color: #000000, white;\n"
+                                    + "    -fx-background-insets: 0, 2;\n"
+                                    + "    -fx-background-radius: 5px;\n"
+                                    + "    -fx-padding: 5px;");
+                        }
+                        series.getNode().lookup(".chart-series-line").setStyle("-fx-stroke: black;");
                         heartRateLabel.textProperty().bind(Bindings.concat("Heart Rate: ", hr));
                         //Add to database
                         try {

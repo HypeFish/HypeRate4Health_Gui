@@ -51,6 +51,7 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/glassfish/tyrus/tyrus-container-grizzly-client/1.15/tyrus-container-grizzly-client-1.15.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/javax/json/javax.json-api/1.1.4/javax.json-api-1.1.4.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/glassfish/grizzly/grizzly-http/2.4.4/grizzly-http-2.4.4.jar" path-in-jar="/" />
+      <element id="library" level="project" name="mysql-connector-j-8.0.32" />
     </root>
   </artifact>
 </component>

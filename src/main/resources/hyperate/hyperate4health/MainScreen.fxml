@@ -1,67 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.LineChart?>
-<?import javafx.scene.chart.NumberAxis?>
+<?import java.net.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
-<?import java.net.URL?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500"
-            prefWidth="800" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="hyperate.hyperate4health.MainScreenController">
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500" prefWidth="800" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hyperate.hyperate4health.MainScreenController">
 
     <!--    Place the Title at the top in red-->
     <top>
-        <Text fill="#7bddee" strokeType="OUTSIDE" strokeWidth="0.0" text="Main Menu"
-              BorderPane.alignment="CENTER">
+        <Text fill="#7bddee" strokeType="OUTSIDE" strokeWidth="0.0" text="Hyperate4Health" underline="true" BorderPane.alignment="CENTER">
             <font>
-                <Font name="System Bold" size="36.0"/>
+                <Font name="System Bold" size="36.0" />
             </font>
         </Text>
     </top>
 
     <center>
-        <LineChart fx:id="lineChart" prefHeight="400.0" prefWidth="400.0" title="Heart Monitor"
-                   BorderPane.alignment="CENTER">
+        <LineChart fx:id="lineChart" prefHeight="400.0" prefWidth="400.0" BorderPane.alignment="CENTER">
             <xAxis>
-                <CategoryAxis label="Time" prefHeight="36.0" prefWidth="400.0" side="BOTTOM" tickLabelFill="#7bddee"
-                              fx:id="xAxis"/>
+                <CategoryAxis label="Time" prefHeight="36.0" prefWidth="400.0" side="BOTTOM" tickLabelFill="#7bddee" fx:id="xAxis" />
             </xAxis>
             <yAxis>
-                <NumberAxis fx:id="yAxis" autoRanging="false" forceZeroInRange="false" label="Heart Rate"
-                            lowerBound="60.0" minorTickCount="2" minorTickLength="3.0" side="LEFT"
-                            tickLabelFill="#7bddee" tickLabelGap="5.0" tickLength="5.0" upperBound="150.0"/>
+                <NumberAxis fx:id="yAxis" autoRanging="false" forceZeroInRange="false" label="Heart Rate" lowerBound="60.0" minorTickCount="1" minorTickLength="3.0" side="LEFT" tickLabelFill="#7bddee" tickLabelGap="5.0" tickLength="5.0" tickUnit="10.0" upperBound="170.0" />
             </yAxis>
         </LineChart>
     </center>
     <left>
         <!--        Move the label to the top of the left-->
         <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0" BorderPane.alignment="CENTER">
-            <Label fx:id="heartRateLabel" prefHeight="17.0" prefWidth="100.0" text="Heart Rate: " textFill="#7bddee"
-                   wrapText="true"/>
-            <Label fx:id="nameLabel" prefHeight="17.0" prefWidth="100.0" text="Name: " textFill="#7bddee"/>
-            <Label fx:id="ageLabel" prefHeight="17.0" prefWidth="100.0" text="Age: " textFill="#7bddee"/>
-            <Label fx:id="dobLabel" prefHeight="17.0" prefWidth="100.0" text="Date of Birth: " textFill="#7bddee"/>
+            <Label fx:id="heartRateLabel" prefHeight="17.0" prefWidth="100.0" text="Heart Rate: " textFill="#7bddee" wrapText="true" />
+            <Label fx:id="nameLabel" prefHeight="17.0" prefWidth="100.0" text="Name: " textFill="#7bddee" />
+            <Label fx:id="ageLabel" prefHeight="17.0" prefWidth="100.0" text="Age: " textFill="#7bddee" />
+            <Label fx:id="dobLabel" prefHeight="17.0" prefWidth="100.0" text="Date of Birth: " textFill="#7bddee" />
         </VBox>
     </left>
 
     <bottom>
         <!--        Add two buttons to Start and Quit-->
         <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
-            <Button mnemonicParsing="false" onAction="#startButtonPressed" text="Start" textAlignment="CENTER"
-                    textFill="#ff0000" wrapText="true"/>
-            <Button mnemonicParsing="false" onAction="#quitButtonPressed" text="Quit" textAlignment="CENTER"
-                    textFill="#ff0000" wrapText="true"/>
-            <Button mnemonicParsing="false" onAction="#save" text="Save to Database" textAlignment="CENTER"
-                    textFill="#ff1e1e" wrapText="true" BorderPane.alignment="CENTER"/>
+            <Button mnemonicParsing="false" onAction="#startButtonPressed" text="Start" textAlignment="CENTER" textFill="#ff0000" wrapText="true" />
+            <Button mnemonicParsing="false" onAction="#quitButtonPressed" text="Quit" textAlignment="CENTER" textFill="#ff0000" wrapText="true" />
+            <Button mnemonicParsing="false" onAction="#save" text="Save to Database" textAlignment="CENTER" textFill="#ff1e1e" wrapText="true" BorderPane.alignment="CENTER" />
         </HBox>
     </bottom>
 
     <!--    Set background-->
     <stylesheets>
-        <URL value="@MainScreen.css"/>
+        <URL value="@MainScreen.css" />
     </stylesheets>
 
 </BorderPane>
