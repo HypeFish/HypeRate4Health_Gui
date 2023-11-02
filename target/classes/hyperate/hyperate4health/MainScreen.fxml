@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500" prefWidth="800" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hyperate.hyperate4health.MainScreenController">
+
+    <!--    Place the Title at the top in red-->
+    <top>
+        <Text fill="#7bddee" strokeType="OUTSIDE" strokeWidth="0.0" text="Hyperate4Health" underline="true" BorderPane.alignment="CENTER">
+            <font>
+                <Font name="System Bold" size="36.0" />
+            </font>
+        </Text>
+    </top>
+
+    <center>
+        <LineChart fx:id="lineChart" prefHeight="408.0" prefWidth="543.0" BorderPane.alignment="CENTER">
+            <xAxis>
+                <CategoryAxis label="Time" prefHeight="36.0" prefWidth="400.0" side="BOTTOM" tickLabelFill="#7bddee" fx:id="xAxis" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis fx:id="yAxis" autoRanging="false" forceZeroInRange="false" label="Heart Rate" lowerBound="60.0" minorTickCount="1" minorTickLength="3.0" side="LEFT" tickLabelFill="#7bddee" tickLabelGap="5.0" tickLength="5.0" tickUnit="10.0" upperBound="170.0" />
+            </yAxis>
+        </LineChart>
+    </center>
+    <bottom>
+        <!--        Add two buttons to Start and Quit-->
+        <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="457.0" spacing="20.0" BorderPane.alignment="CENTER">
+            <Button mnemonicParsing="false" onAction="#startButtonPressed" prefHeight="32.0" prefWidth="110.0" text="Start" textAlignment="CENTER" textFill="#ff0000" wrapText="true">
+            <HBox.margin>
+               <Insets left="10.0" />
+            </HBox.margin></Button>
+            <Button mnemonicParsing="false" onAction="#quitButtonPressed" prefHeight="34.0" prefWidth="115.0" text="Quit" textAlignment="CENTER" textFill="#ff0000" wrapText="true" />
+            <Label fx:id="heartRateLabel" prefHeight="24.0" prefWidth="123.0" text="Heart Rate: " textFill="#7bddee" wrapText="true" />
+            <Label fx:id="startedLabel" prefHeight="29.0" prefWidth="162.0" text="Started: " textFill="#7bddee" wrapText="true" />
+        </HBox>
+    </bottom>
+    
+    <stylesheets>
+        <URL value="@MainScreen.css" />
+    </stylesheets>
+
+</BorderPane>

@@ -1,0 +1,27 @@
+/* set the background image */
+.root {
+    -fx-background-image: url("blue_background.jpg");
+}
+
+
+/*Set the label to red*/
+
+.label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7bddee;
+    -fx-effect: dropshadow(gaussian, rgba(217, 177, 177, 0.5), 0, 0, 0, 1);
+}
+
+/*Change the color of the button*/
+.button {
+    -fx-background-color: #2abad9;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(217, 177, 177, 0.5), 0, 0, 0, 1);
+}
+
+.button:hover {
+    -fx-background-color: #2A5058;
+}

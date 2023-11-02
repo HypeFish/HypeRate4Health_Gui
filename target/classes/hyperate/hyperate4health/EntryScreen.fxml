@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import java.net.URL?>
+<GridPane centerShape="false" focusTraversable="true" hgap="30.0" maxHeight="-Infinity" maxWidth="-Infinity"
+          minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" styleClass="root" vgap="30.0"
+          xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="hyperate.hyperate4health.LoginController">
+
+    <padding>
+        <Insets bottom="10.0" left="25.0" right="25.0" top="25.0"/>
+    </padding>
+
+    <Text id="welcome-text" fill="#fc0000" fontSmoothingType="LCD" text="Hyperate4Health" textAlignment="CENTER"
+          underline="true" wrappingWidth="244.875" GridPane.columnSpan="2">
+        <font>
+            <Font name="System Bold" size="13.0"/>
+        </font>
+    </Text>
+
+    <Label prefHeight="15.0" prefWidth="77.0" text="Hyperate ID:" textFill="#ee6969" GridPane.columnIndex="1"
+           GridPane.rowIndex="1"/>
+    <TextField fx:id="hyperateId" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+
+    <Label text="Save Path:" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+    <Button text="Choose Directory" onAction="#handleChooseDirectoryButton" GridPane.columnIndex="2"
+            GridPane.rowIndex="2"/>
+
+    <Label text="Directory:" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+    <TextField fx:id="directory" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+
+    <Label text="Subject ID:" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+    <TextField fx:id="subjectId" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+
+
+    <HBox alignment="bottom_right" spacing="10" GridPane.columnIndex="2" GridPane.rowIndex="7">
+        <Button defaultButton="true" onAction="#handleSubmitButtonAction" prefHeight="25.0" prefWidth="164.0"
+                text="Sign In"/>
+    </HBox>
+
+    <Text fx:id="loginText" GridPane.columnIndex="2" GridPane.rowIndex="6"/>
+
+
+    <stylesheets>
+        <URL value="@Login.css"/>
+    </stylesheets>
+    <columnConstraints>
+        <ColumnConstraints/>
+        <ColumnConstraints/>
+        <ColumnConstraints/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints/>
+        <RowConstraints/>
+        <RowConstraints/>
+        <RowConstraints/>
+        <RowConstraints/>
+        <RowConstraints/>
+        <RowConstraints/>
+        <RowConstraints/>
+    </rowConstraints>
+
+
+</GridPane>
