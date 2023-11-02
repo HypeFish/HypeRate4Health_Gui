@@ -29,7 +29,7 @@
         <junit.version>5.9.1</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>19</java.version>
+        <java.version>17</java.version>
         <javafx.main.class>hyperate.hyperate4health.App</javafx.main.class>
         <main.class>hyperate.hyperate4health.Hyperate4Health</main.class>
     </properties>
@@ -53,20 +53,26 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>19</version>
-            <classifier>mac-aarch64</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>19</version>
-            <classifier>mac-aarch64</classifier>
         </dependency>
-
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>19</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>19</version>
+        </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
             <version>19</version>
-            <classifier>mac-aarch64</classifier>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
@@ -147,11 +153,6 @@
             <groupId>org.glassfish.tyrus.bundles</groupId>
             <artifactId>tyrus-standalone-client</artifactId>
             <version>1.20</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.tyrus</groupId>
-            <artifactId>tyrus-container-grizzly-client</artifactId>
-            <version>1.15</version>
         </dependency>
         <dependency>
             <groupId>javax.json</groupId>

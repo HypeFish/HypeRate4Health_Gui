@@ -10,6 +10,7 @@ module hyperate.hyperate4health {
     requires org.json;
     requires com.google.gson;
     requires java.desktop;
+    requires javafx.swing; // Add this line if you're using javafx.swing
 
 
     exports hyperate.hyperate4health;

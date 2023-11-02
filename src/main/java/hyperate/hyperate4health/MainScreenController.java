@@ -6,35 +6,24 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.Label;
 
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 
 public class MainScreenController implements Initializable {
 
     private final int WINDOW_SIZE = 10;
     @FXML
-    private Label ageLabel;
-    @FXML
-    private Label dobLabel;
-    @FXML
-    private Label nameLabel;
-    @FXML
     private Label heartRateLabel;
+    @FXML
+    private Label startedLabel;
     @FXML
     private CategoryAxis xAxis = new CategoryAxis();
     @FXML
@@ -46,18 +35,13 @@ public class MainScreenController implements Initializable {
     private String hyperateId;
     private int timeout;
     private String filepath;
+    private String subjectId;
     private TimerTask task;
-    private Connection connection;
-    private String databaseUser;
-    private String databasePassword;
-    private String databaseUrl;
     private boolean isRunning = false;
-    private String name;
-    private int age;
-    private String dob;
 
-    private void setMonitor(String hyperateId, int timeout, String filepath) {
-        this.hrMonitor = new FirstMonitor(hyperateId, timeout, filepath);
+
+    private void setMonitor(String hyperateId, int timeout, String filepath, String subjectID) {
+        this.hrMonitor = new FirstMonitor(hyperateId, timeout, filepath, subjectID);
 
     }
 
@@ -65,52 +49,43 @@ public class MainScreenController implements Initializable {
         this.hyperateId = hyperateId;
         this.timeout = timeout;
         this.filepath = filepath;
-
-        nameLabel.textProperty().bind(Bindings.concat("Name: ", name));
-        ageLabel.textProperty().bind(Bindings.concat("Age: ", age));
-        //put dob like yy/mm/dd
-        dobLabel.textProperty().bind(Bindings.concat("DOB: ", dob));
+        this.subjectId = subjectId;
 
         if (!isRunning) {
             return;
         }
-        setMonitor(hyperateId, timeout, filepath);
+        setMonitor(hyperateId, timeout, filepath, subjectId);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        //defining the axes
         lineChart.getParent();
         xAxis.setLabel("Time/s");
-        xAxis.setAnimated(false); // axis animations are removed
+        xAxis.setAnimated(false);
         yAxis.setLabel("Value");
-        yAxis.setAnimated(false); // axis animations are removed
+        yAxis.setAnimated(false);
         lineChart.setTitle("Heart Rate Monitor");
-        lineChart.setAnimated(false); // disable animations
-        //defining a series to display data
+        lineChart.setAnimated(false);
         series = new XYChart.Series<>();
         series.setName("Data Series");
         lineChart.getData().add(series);
 
-        this.heartRateLabel.textProperty().bind(Bindings.concat("Heart Rate: ", "0"));
+        heartRateLabel.textProperty().bind(Bindings.concat("Heart Rate: ", "0"));
+        startedLabel.textProperty().bind(Bindings.concat(""));
+
+        //Set font size larger for labels
+        heartRateLabel.setStyle("-fx-font-size: 20px;");
+        startedLabel.setStyle("-fx-font-size: 20px;");
     }
 
-    public void sendInfo(String hyperateId, String name, int age, String dob, String databaseUser, String databasePassword, String databaseUrl) {
+    public void sendInfo(String hyperateId, String subjectID) {
         this.hyperateId = hyperateId;
-        this.name = name;
-        this.age = age;
-        this.dob = dob;
-        this.databaseUser = databaseUser;
-        this.databasePassword = databasePassword;
-        this.databaseUrl = databaseUrl;
-
+        this.subjectId = subjectID;
     }
 
     @FXML
     private void startButtonPressed() {
-
-        //Create the monitor
         if (isRunning) {
             return;
         }
@@ -118,6 +93,7 @@ public class MainScreenController implements Initializable {
         createMonitor(hyperateId, timeout, filepath);
         hrMonitor.start();
         beginTimer();
+        startedLabel.textProperty().bind(Bindings.concat("Started!"));
     }
 
     private void beginTimer() {
@@ -134,29 +110,14 @@ public class MainScreenController implements Initializable {
                         series.getData().add(new XYChart.Data<>(time, hr));
                         Set<Node> nodes = lineChart.lookupAll(".series" + 0);
                         for (Node n : nodes) {
-                            n.setStyle("-fx-background-color: #000000, white;\n"
-                                    + "    -fx-background-insets: 0, 2;\n"
-                                    + "    -fx-background-radius: 5px;\n"
-                                    + "    -fx-padding: 5px;");
+                            n.setStyle("""
+                                    -fx-background-color: #000000, white;
+                                        -fx-background-insets: 0, 2;
+                                        -fx-background-radius: 5px;
+                                        -fx-padding: 5px;""");
                         }
                         series.getNode().lookup(".chart-series-line").setStyle("-fx-stroke: black;");
                         heartRateLabel.textProperty().bind(Bindings.concat("Heart Rate: ", hr));
-                        //Add to database
-                        try {
-                            connection = DriverManager.getConnection(databaseUrl, databaseUser, databasePassword);
-                            PreparedStatement preparedStatement =
-                                    connection.prepareStatement("INSERT INTO " +
-                                            "heartrate (hyperate_id, name, value, time) VALUES (?,?,?,?)");
-                            preparedStatement.setString(1, hyperateId);
-                            preparedStatement.setString(2, name);
-                            preparedStatement.setInt(3, hr);
-                            preparedStatement.setString(4,
-                                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-                            preparedStatement.executeUpdate();
-
-                        } catch (SQLException e) {
-                            new Alert(Alert.AlertType.ERROR, "Could not connect to database").showAndWait();
-                        }
                     } catch (NullPointerException e) {
                         //Do nothing
                     }
@@ -166,7 +127,6 @@ public class MainScreenController implements Initializable {
         };
         Timer timer = new Timer();
         timer.schedule(task, 0, 3000);
-
     }
 
     @FXML
@@ -178,112 +138,18 @@ public class MainScreenController implements Initializable {
 
         this.isRunning = false;
         this.hrMonitor.stopApplication();
-        //Stop the graph
         task.cancel();
         series.getData().clear();
         heartRateLabel.textProperty().bind(Bindings.concat("Heart Rate: ", "0"));
+        startedLabel.textProperty().bind(Bindings.concat("Stopped!"));
 
     }
 
     @FXML
-    private void save() {
-        signIn();
-    }
-
-    private void saveData() {
-        PreparedStatement preparedStatement;
-        try {
-            preparedStatement = connection.prepareStatement("Call insert_heartrate(?,?,?,?,?,?)");
-            preparedStatement.setString(1, this.hyperateId);
-            preparedStatement.setString(2, this.name);
-            if (this.hrMonitor == null) {
-                preparedStatement.setInt(3, 0);
-            } else {
-                preparedStatement.setInt(3, this.hrMonitor.getHeartRate());
-            }
-            preparedStatement.setString(
-                    4, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            preparedStatement.setInt(5, this.age);
-            preparedStatement.setString(6, this.dob);
-            preparedStatement.executeUpdate();
-            new Alert(Alert.AlertType.INFORMATION, "Data saved successfully").showAndWait();
-        } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, "Data could not be saved").showAndWait();
+    private void handleClose() {
+        if (hrMonitor != null) {
+            hrMonitor.stopApplication();
         }
-    }
-
-    private void signIn() {
-        loginDialog();
-
-    }
-
-    public void loginDialog() {
-        //Ask if the user wants to log in to the database
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Database Login");
-        alert.setHeaderText("Database Login");
-        alert.setContentText("Would you like to log in to the database?");
-        Optional<ButtonType> result = alert.showAndWait();
-
-        if (result.isPresent())
-            if (result.get().equals(ButtonType.OK)) {
-                GridPane gridPane = new GridPane();
-                gridPane.setHgap(10);
-                gridPane.setVgap(10);
-                gridPane.setPadding(new Insets(20, 150, 10, 10));
-
-                TextField databaseUser = new TextField();
-                databaseUser.setPromptText("Database Username");
-                gridPane.add(databaseUser, 0, 0);
-
-                PasswordField databasePassword = new PasswordField();
-                databasePassword.setPromptText("Database Password");
-                gridPane.add(databasePassword, 0, 1);
-
-                alert = new Alert(Alert.AlertType.NONE);
-                alert.setTitle("Database Login");
-                alert.setHeaderText("Database Login");
-                alert.getDialogPane().setContent(gridPane);
-                alert.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-                result = alert.showAndWait();
-                this.databaseUser = databaseUser.getText();
-                this.databasePassword = databasePassword.getText();
-                if (result.isPresent())
-                    if (result.get().equals(ButtonType.OK)) {
-                        this.verifyDatabaseLogin();
-                    } else {
-                        this.nameLabel.getParent().setDisable(false);
-                    }
-            } else {
-                this.nameLabel.getParent().setDisable(false);
-            }
-    }
-
-    private void verifyDatabaseLogin() {
-        //Verify the login details
-        //If correct, save the data to the database
-        //If incorrect, display an error message
-        try {
-            this.connection = this.getConnection();
-            this.saveData();
-        } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, "Incorrect login details").showAndWait();
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Get a new database connection
-     *
-     * @return The Connection Object
-     * @throws SQLException if getConnection fails.
-     */
-    public Connection getConnection() throws SQLException {
-        Properties connectionProps = new Properties();
-        connectionProps.put("user", this.databaseUser);
-        connectionProps.put("password", this.databasePassword);
-        connection = DriverManager.getConnection(databaseUrl, connectionProps);
-
-        return connection;
+        Platform.exit();
     }
 }

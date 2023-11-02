@@ -41,22 +41,25 @@ public class CommandController implements HRControl {
         Scanner scanner = new Scanner(in);
         view.renderMessage("Enter the HypeRate device ID. Example: AB12\n");
         final String hyperateId = scanner.nextLine();
-        view.renderMessage(
-                "Enter the path to where you want to save the file. To override default file naming, you can specify a filename ending in .csv\n" +
-                "Example: /user/Documents\n" +
-                "Example: /user/Documents/HR.csv\n" +
-                "(i) If the file exists already, it will be replaced.\n");
+        view.renderMessage("""
+                Enter the path to where you want to save the file. To override default file naming, you can specify a
+                 filename ending in .csv
+                Example: /user/Documents
+                Example: /user/Documents/HR.csv
+                (i) If the file exists already, it will be replaced.
+                """);
         final String savePath = scanner.nextLine();
-        view.renderMessage(
-                "Enter the minimum time allowed between HR signals for the connection to remain open and "
-                        + "the program to be running.\n");
+        view.renderMessage("Enter the minimum time allowed between HR signals for the connection to remain open and " + "the program to be running.\n");
         int timeout;
-       try {
-             timeout = Integer.parseInt(scanner.nextLine());
+        try {
+            timeout = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
             view.renderMessage("Invalid timeout. Please try again.\n");
             return;
-       }
+        }
+        view.renderMessage("Enter the subject ID.\n");
+        final String subjectID = scanner.nextLine();
+
         view.renderMessage("Starting recording...\n");
         if (hyperateId == null || hyperateId.length() != 4) {
             view.renderMessage("Invalid HypeRate ID. Please try again.\n");
@@ -71,22 +74,19 @@ public class CommandController implements HRControl {
             return;
         }
 
-        if (hyperateId.equalsIgnoreCase("quit") || hyperateId.equalsIgnoreCase("exit") ||
-                savePath.equalsIgnoreCase("quit") || savePath.equalsIgnoreCase("exit") ||
-                timeout == 0) {
+
+        if (hyperateId.equalsIgnoreCase("quit") || hyperateId.equalsIgnoreCase("exit") || savePath.equalsIgnoreCase("quit") || savePath.equalsIgnoreCase("exit") || timeout == 0) {
             view.renderMessage("Program exited.\n");
             return;
 
         }
 
 
-        FirstMonitor monitor = new FirstMonitor(hyperateId, timeout, savePath);
+        FirstMonitor monitor = new FirstMonitor(hyperateId, timeout, savePath, subjectID);
         monitor.start();
 
-        view.renderMessage("Connection to Hyperate established with ID " + hyperateId
-                + "\n(i) For a better visual go to: app.hyperate.io/" + hyperateId + "\n");
-        view.renderMessage(
-                "Heart rate data will be saved to: " + savePath + "/" + "HR:" + hyperateId + ".csv" + "\n");
+        view.renderMessage("Connection to Hyperate established with ID " + hyperateId + "\n(i) For a better visual " + "go to: app.hyperate.io/" + hyperateId + "\n");
+        view.renderMessage("Heart rate data will be saved to: " + savePath + "/" + "HR:" + hyperateId + ".csv" + "\n");
         view.renderMessage("Heart rate will be saved every " + 3 + " seconds" + "\n");
 
         view.renderMessage("Type quit or exit to stop recording\n");

@@ -52,6 +52,7 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
   protected final String hyperateId;
   protected final int timeout;
   protected final String savePath;
+  protected final String subjectID;
   protected final Timer responseBeat = new Timer();
   protected final HashMap<Timestamp, Integer> data = new HashMap<>();
   protected Session session;
@@ -61,21 +62,25 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
   /**
    * This constructor will create a new FirstMonitor object.
    */
-  public FirstMonitor(String hyperateId, int timeout, String savePath) {
+  public FirstMonitor(String hyperateId, int timeout, String savePath, String subjectID) {
 
-    if (hyperateId == null || hyperateId.equals("")) {
+    if (hyperateId == null || hyperateId.isEmpty()) {
       throw new IllegalArgumentException("Hyperate ID cannot be null or empty");
     }
     if (timeout < 0) {
       throw new IllegalArgumentException("timeout cannot be negative");
     }
-    if (savePath == null || savePath.equals("")) {
+    if (savePath == null || savePath.isEmpty()) {
       throw new IllegalArgumentException("Save path cannot be null or empty");
+    }
+    if (subjectID == null || subjectID.isEmpty()) {
+      throw new IllegalArgumentException("Subject ID cannot be null or empty");
     }
 
     this.hyperateId = hyperateId;
     this.timeout = timeout;
     this.savePath = savePath;
+    this.subjectID = subjectID;
 
     try {
       WebSocketContainer container = ContainerProvider.getWebSocketContainer();
@@ -97,7 +102,7 @@ public class FirstMonitor extends Endpoint implements HRMonitor {
   @OnOpen
   public void onOpen(Session session, EndpointConfig config) {
     this.session = session;
-    this.file = new File(savePath + "/" + "HR:" + this.hyperateId + ".csv");
+    this.file = new File(savePath + "/" + "hr_sub_ " + this.subjectID + ".csv");
     String login = new JSONObject()
             .put("topic", "hr:" + hyperateId)
             .put("event", "phx_join")
